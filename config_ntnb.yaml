@@ -1,0 +1,177 @@
+# ============================================
+# CONFIGURAÇÕES NTN-B
+# ============================================
+
+# Configurações gerais
+timezone: "America/Sao_Paulo"
+max_lookback_days: 25
+output_directory: "C:\\Users\\Andrew Lopes\\OneDrive - BCP Securities\\Área de Trabalho\\Python NTN-B\\dados"
+
+# Períodos de deslocamento para comparação (em dias)
+deslocamentos:
+  - 1    # 1 dia
+  - 7    # 1 semana
+  - 30   # 1 mês
+  - 90   # 3 meses
+  - 180  # 6 meses
+  - 360  # 1 ano
+  - 720  # 2 anos
+
+# Configuração de coleta histórica
+historico:
+  dias_3_anos: 1095
+  dias_90: 90
+  max_offset_adicional: 120
+
+# Maturidades NTN-B Principal para análise
+maturities:
+  - date: "2030-08-15"
+    label: "NTN-B Principal 15/08/2030"
+    bond_type: "PRINCIPAL"
+
+  - date: "2032-05-15"
+    label: "NTN-B Principal 15/05/2032"
+    bond_type: "PRINCIPAL"
+
+  - date: "2035-05-15"
+    label: "NTN-B Principal 15/05/2035"
+    bond_type: "PRINCIPAL"
+
+  - date: "2040-08-15"
+    label: "NTN-B Principal 15/08/2040"
+    bond_type: "PRINCIPAL"
+
+  - date: "2045-05-15"
+    label: "NTN-B Principal 15/05/2045"
+    bond_type: "PRINCIPAL"
+
+  - date: "2050-08-15"
+    label: "NTN-B Principal 15/08/2050"
+    bond_type: "PRINCIPAL"
+
+  - date: "2060-08-15"
+    label: "NTN-B Principal 15/08/2060"
+    bond_type: "PRINCIPAL"
+
+# Filtros
+filtros:
+  ano_minimo_vencimento: 2030
+
+# Formatação de saída
+formato:
+  decimal_separator: ","
+  csv_separator: ";"
+  csv_encoding: "utf-8-sig"
+  date_format: "%d/%m/%Y"
+  date_format_file: "%Y%m%d"
+  percent_decimals: 4
+
+# Configurações de gráficos
+graficos:
+  dpi: 200
+
+  # Tamanho dos gráficos [largura, altura]
+  figsize:
+    tabela_width: 12
+    tabela_min_height: 3
+    tabela_height_per_row: 0.4
+    grafico_curva: [11, 7]
+    grafico_historico: [14, 6]
+
+  # Configurações de estilo
+  estilo:
+    linewidth: 1.5
+    fontsize_label: 8
+    fontsize_table: 8
+    table_scale: 1.4
+    rotation_xaxis: 45
+
+  # Localizador de datas
+  date_locator:
+    minticks: 6
+    maxticks: 10
+
+# Logging
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  format: "%(asctime)s - %(levelname)s - %(message)s"
+  date_format: "%Y-%m-%d %H:%M:%S"
+
+# Configurações DI Futuro
+di_futuro:
+  enabled: true  # Habilita coleta e exibição de DI Futuro
+  meses_vencimento: [1]  # Meses para filtrar (1=Jan, 2=Fev, etc). Apenas Janeiro para DI1F
+  deslocamentos: [1, 7, 30]  # Períodos de comparação (dias): D-1, D-7, D-30
+
+  # Vencimentos específicos para gráficos históricos
+  # Apenas contratos com histórico Bloomberg
+  vencimentos_graficos:
+    - "DI1F27"
+    - "DI1F28"
+    - "DI1F29"
+    - "DI1F30"
+    - "DI1F32"
+    - "DI1F35"
+
+  # Configurações de gráficos específicos para DI
+  graficos:
+    historico_12_meses: 365
+    historico_3_anos: 1095
+    historico_5_anos: 1825
+
+# Configurações de Análises Avançadas
+analises_avancadas:
+  enabled: true  # Habilita todas as análises avançadas
+
+  # Breakeven Inflation (Inflação Implícita)
+  breakeven:
+    enabled: true
+    # Pares de vencimentos NTN-B x DI para cálculo de BEI
+    pares_vencimento:
+      - ntnb: "2030-08-15"
+        di: "DI1F30"
+      - ntnb: "2035-05-15"
+        di: "DI1F35"
+
+  # Steepness (Inclinação da Curva)
+  steepness:
+    enabled: true
+    # Steepness DI Futuro
+    di:
+      ticker_curto: "DI1F27"
+      ticker_longo: "DI1F35"
+      label: "DI 2027-2035"
+    # Steepness NTN-B
+    ntnb:
+      venc_curto: "2030-08-15"
+      venc_longo: "2060-08-15"
+      label: "NTN-B 2030-2060"
+
+  # Estatísticas Históricas (High/Low)
+  estatisticas:
+    enabled: true
+    periodos: [30, 90, 365]  # Períodos em dias para calcular High/Low
+
+  # Médias Móveis
+  medias_moveis:
+    enabled: true
+    periodos: [20, 50, 200]  # Períodos para MA
+
+# Expectativas FOCUS BCB
+focus_bcb:
+  enabled: true
+  cache_dias: 1  # Cache válido por 1 dia
+  indicadores:
+    - "IPCA"
+    - "Selic"
+
+# Configurações de Email
+email:
+  enabled: true  # Mude para true para habilitar envio automático
+  smtp_server: "smtp.gmail.com"
+  smtp_port: 587
+  sender_email: "andrewskt@gmail.com"
+  sender_password: "lvyd udcw ysmh ozmo"  # IMPORTANTE: Use uma senha de aplicativo do Gmail (https://myaccount.google.com/apppasswords)
+  recipients:
+    - "alopes@bcpsecurities.com"
+  subject: "Relatório NTN-B - {date}"  # {date} será substituído pela data de referência
