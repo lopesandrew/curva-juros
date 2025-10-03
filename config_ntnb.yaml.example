@@ -1,11 +1,12 @@
 # ============================================
-# CONFIGURAÇÕES NTN-B
+# CONFIGURAÇÕES NTN-B - ARQUIVO DE EXEMPLO
 # ============================================
+# Copie este arquivo para config_ntnb.yaml e ajuste os valores
 
 # Configurações gerais
 timezone: "America/Sao_Paulo"
 max_lookback_days: 25
-output_directory: "C:\\Users\\Andrew Lopes\\OneDrive - BCP Securities\\Área de Trabalho\\Python NTN-B\\dados"
+output_directory: "dados"  # Diretório relativo para salvar os dados
 
 # Períodos de deslocamento para comparação (em dias)
 deslocamentos:
@@ -104,7 +105,6 @@ di_futuro:
   deslocamentos: [1, 7, 30]  # Períodos de comparação (dias): D-1, D-7, D-30
 
   # Vencimentos específicos para gráficos históricos
-  # Apenas contratos com histórico Bloomberg
   vencimentos_graficos:
     - "DI1F27"
     - "DI1F28"
@@ -167,11 +167,11 @@ focus_bcb:
 
 # Configurações de Email
 email:
-  enabled: true  # Mude para true para habilitar envio automático
+  enabled: false  # Mude para true para habilitar envio automático
   smtp_server: "smtp.gmail.com"
   smtp_port: 587
-  sender_email: "andrewskt@gmail.com"
-  sender_password: "lvyd udcw ysmh ozmo"  # IMPORTANTE: Use uma senha de aplicativo do Gmail (https://myaccount.google.com/apppasswords)
+  sender_email: "seu_email@gmail.com"
+  sender_password: "sua_senha_de_aplicativo_aqui"  # IMPORTANTE: Use uma senha de aplicativo do Gmail (https://myaccount.google.com/apppasswords)
   recipients:
-    - "alopes@bcpsecurities.com"
+    - "destinatario@email.com"
   subject: "Relatório NTN-B - {date}"  # {date} será substituído pela data de referência

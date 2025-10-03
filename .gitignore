@@ -9,11 +9,11 @@ venv/
 *.egg-info/
 
 # Data files
-dados/*.csv
-dados/*.html
-dados/*.pdf
-dados/*.png
-dados/cache_*.csv
+dados/
+*.csv
+*.html
+*.pdf
+*.png
 
 # Logs
 *.log
@@ -31,3 +31,9 @@ nul
 
 # Config local
 .claude/settings.local.json
+config_ntnb.yaml
+
+# Documentation (keep only example)
+README_EMAIL.md
+README_DI_BLOOMBERG.md
+INSTRUCOES_BLOOMBERG.txt
