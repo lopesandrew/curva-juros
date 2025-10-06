@@ -532,9 +532,8 @@ def gerar_html_relatorio(
     <div style="max-width: 1200px; margin: 0 auto; background-color: #ffffff; padding: 20px;">''')
 
     # Título e metadados
-    html.append(f'<h1 style="color: #2c3e50; border-bottom: 3px solid #4472C4; padding-bottom: 15px; margin-bottom: 30px; font-size: 24px; font-weight: bold;">Relatório NTN-B - Análise de Taxas</h1>')
+    html.append(f'<h1 style="color: #2c3e50; border-bottom: 3px solid #4472C4; padding-bottom: 15px; margin-bottom: 30px; font-size: 24px; font-weight: bold;">Curva de Juros - {data_str}</h1>')
     html.append(f'<div style="background-color: #f8f9fa; padding: 15px; border-left: 4px solid #4472C4; margin-bottom: 30px;">')
-    html.append(f'<p style="margin: 5px 0; font-size: 14px; color: #555;"><strong>Data de Referência:</strong> {data_str}</p>')
     html.append(f'<p style="margin: 5px 0; font-size: 14px; color: #555;"><strong>Gerado em:</strong> {datetime.now().strftime("%d/%m/%Y %H:%M:%S")}</p>')
     html.append(f'</div>')
 
