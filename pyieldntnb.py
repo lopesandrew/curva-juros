@@ -34,6 +34,9 @@ import pydifuturo_relatorio
 import pyanalise
 import pyfocus
 
+# Módulo Treasuries US
+import pyust_data
+
 
 # ============================================
 # CONFIGURAÇÃO E CONSTANTES
@@ -492,7 +495,11 @@ def gerar_html_relatorio(
     df_steepness_di: Optional[pd.DataFrame] = None,
     df_steepness_ntnb: Optional[pd.DataFrame] = None,
     df_stats_di: Optional[pd.DataFrame] = None,
-    df_focus: Optional[pd.DataFrame] = None
+    df_focus: Optional[pd.DataFrame] = None,
+    # Parâmetros opcionais para Treasuries US
+    df_ust_variacoes: Optional[pd.DataFrame] = None,
+    fig_ust_curva: Optional[plt.Figure] = None,
+    fig_ust_hist_10y: Optional[plt.Figure] = None
 ) -> str:
     """
     Gera relatório HTML completo com tabelas e gráficos (NTN-B e DI Futuro).
@@ -742,23 +749,71 @@ def gerar_html_relatorio(
 
         html.append(df_to_html_table(df_focus, "Expectativas de Mercado - IPCA e Selic"))
 
-    # Footer - Fontes e Pacotes
-    html.append('<div style="margin-top: 50px; padding: 20px; border-top: 2px solid #ddd; background-color: #f8f9fa;">')
-    html.append('<h3 style="color: #2c3e50; font-size: 14px; font-weight: bold; margin-bottom: 15px;">Fontes de Dados</h3>')
-    html.append('<ul style="color: #555; font-size: 12px; line-height: 1.8; margin: 0 0 15px 20px;">')
-    html.append('<li><strong>NTN-B e DI Futuro:</strong> ANBIMA (Associação Brasileira das Entidades dos Mercados Financeiro e de Capitais)</li>')
-    html.append('<li><strong>Expectativas FOCUS:</strong> Banco Central do Brasil (BCB)</li>')
-    html.append('<li><strong>API B3:</strong> Brasil, Bolsa, Balcão (B3)</li>')
+    # ============================================
+    # SEÇÃO: Treasuries US
+    # ============================================
+    if df_ust_variacoes is not None and not df_ust_variacoes.empty:
+        html.append('<div style="page-break-before: always; margin-top: 40px; padding-top: 30px; border-top: 3px solid #4472C4;">')
+        html.append('<h2 style="color: #2c3e50; margin-bottom: 20px; font-size: 20px; font-weight: bold;">📊 US Treasuries</h2>')
+
+        # Tabela de Variações
+        html.append(df_to_html_table(df_ust_variacoes, "Variações de Taxa - Treasuries", highlight_bps=True))
+
+        # Gráfico de Curvas
+        if fig_ust_curva is not None:
+            html.append('<div style="margin: 30px 0;">')
+            html.append('<h3 style="color: #2c3e50; margin-bottom: 15px; font-size: 16px; font-weight: bold; text-align: center;">Curvas de Taxa - Treasuries</h3>')
+            html.append('<div style="text-align: center; margin: 20px 0;">')
+            img_b64 = fig_to_base64(fig_ust_curva, dpi=150)
+            html.append(f'<img src="data:image/png;base64,{img_b64}" alt="Gráfico de Curvas Treasuries" style="width: 100%; max-width: 900px; height: auto; border: 1px solid #ddd; display: block; margin: 0 auto;">')
+            html.append('</div>')
+            html.append('</div>')
+
+        # Gráfico Histórico Treasuries
+        if fig_ust_hist_10y is not None:
+            html.append('<div style="margin: 30px 0;">')
+            html.append('<h3 style="color: #2c3e50; margin-bottom: 15px; font-size: 16px; font-weight: bold; text-align: center;">Histórico - US Treasuries (5Y, 7Y, 10Y, 20Y, 30Y)</h3>')
+            html.append('<div style="text-align: center; margin: 20px 0;">')
+            img_b64 = fig_to_base64(fig_ust_hist_10y, dpi=150)
+            html.append(f'<img src="data:image/png;base64,{img_b64}" alt="Histórico US Treasuries" style="width: 100%; max-width: 1000px; height: auto; border: 1px solid #ddd; display: block; margin: 0 auto;">')
+            html.append('</div>')
+            html.append('</div>')
+
+        html.append('</div>')
+
+    # ============================================
+    # FOOTER: Fontes de Dados e Tecnologias
+    # ============================================
+    html.append('<div style="margin-top: 60px; padding: 30px; border-top: 3px solid #4472C4; background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);">')
+
+    # Fontes de Dados
+    html.append('<h3 style="color: #2c3e50; font-size: 16px; font-weight: bold; margin-bottom: 20px; border-bottom: 2px solid #4472C4; padding-bottom: 10px;">📊 Fontes de Dados</h3>')
+    html.append('<ul style="color: #555; font-size: 12px; line-height: 2.0; margin: 0 0 25px 20px; list-style-type: none;">')
+    html.append('<li style="padding: 5px 0;">📈 <strong>NTN-B:</strong> ANBIMA (Associação Brasileira das Entidades dos Mercados Financeiro e de Capitais)</li>')
+    html.append('<li style="padding: 5px 0;">💹 <strong>DI Futuro:</strong> B3 (Brasil, Bolsa, Balcão) via API</li>')
+    html.append('<li style="padding: 5px 0;">🏦 <strong>Expectativas FOCUS:</strong> Banco Central do Brasil (BCB)</li>')
+    html.append('<li style="padding: 5px 0;">🇺🇸 <strong>US Treasuries:</strong> Federal Reserve Economic Data (FRED) - St. Louis Fed</li>')
     html.append('</ul>')
-    html.append('<h3 style="color: #2c3e50; font-size: 14px; font-weight: bold; margin-bottom: 15px;">Tecnologias Utilizadas</h3>')
-    html.append('<p style="color: #555; font-size: 12px; line-height: 1.8; margin: 0;"><strong>Python 3.x</strong> com os seguintes pacotes:</p>')
-    html.append('<ul style="color: #555; font-size: 12px; line-height: 1.8; margin: 5px 0 0 20px;">')
+
+    # Tecnologias
+    html.append('<h3 style="color: #2c3e50; font-size: 16px; font-weight: bold; margin-bottom: 20px; border-bottom: 2px solid #4472C4; padding-bottom: 10px;">🛠️ Tecnologias Utilizadas</h3>')
+    html.append('<p style="color: #555; font-size: 12px; line-height: 1.8; margin: 0 0 10px 0;"><strong>Python 3.x</strong> com os seguintes pacotes:</p>')
+    html.append('<ul style="color: #555; font-size: 12px; line-height: 1.8; margin: 0 0 0 20px; list-style-type: disc;">')
     html.append('<li><strong>pandas</strong> - Manipulação e análise de dados</li>')
     html.append('<li><strong>numpy</strong> - Computação numérica</li>')
     html.append('<li><strong>matplotlib</strong> - Visualização de dados e gráficos</li>')
     html.append('<li><strong>requests</strong> - Requisições HTTP para APIs</li>')
     html.append('<li><strong>PyYAML</strong> - Configuração em formato YAML</li>')
+    html.append('<li><strong>pyield</strong> - Biblioteca para dados de NTN-B</li>')
+    html.append('<li><strong>fredapi</strong> - API para dados do Federal Reserve (FRED)</li>')
+    html.append('<li><strong>feedparser</strong> - Parser de feeds RSS/Atom para notícias</li>')
     html.append('</ul>')
+
+    # Copyright
+    html.append('<div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; text-align: center;">')
+    html.append('<p style="color: #999; font-size: 11px; margin: 0;">Relatório gerado automaticamente | Desenvolvido com Python 3.x</p>')
+    html.append('</div>')
+
     html.append('</div>')
 
     html.append('</div></body></html>')
@@ -2231,7 +2286,164 @@ def main() -> None:
             logging.error(f"Erro ao coletar FOCUS: {e}")
 
     # ============================================
-    # Gerar HTML (NTN-B + DI Futuro + Análises)
+    # 5. US Treasuries
+    # ============================================
+    df_ust_variacoes = None
+    fig_ust_curva_html = None
+    fig_ust_hist_10y_html = None
+
+    ust_cfg = config.get('treasuries', {})
+    if ust_cfg.get('enabled', False):
+        try:
+            logging.info("=" * 60)
+            logging.info("Coletando dados de US Treasuries")
+            logging.info("=" * 60)
+
+            # Buscar dados do FRED
+            df_ust = pyust_data.buscar_treasuries(config)
+
+            if df_ust is not None and not df_ust.empty:
+                logging.info(f"Dados de Treasuries coletados: {len(df_ust)} registros")
+
+                # Calcular variações
+                treasury = pyust_data.TreasuryData(ust_cfg.get('fred_api_key'))
+                df_ust_var = treasury.calcular_variacoes(df_ust, periodos=[1, 5, 21])
+
+                # Preparar tabela de variações para HTML
+                ultimo_dia = df_ust.iloc[-1]
+                var_1d = df_ust_var.iloc[-1] if len(df_ust_var) > 0 else None
+                var_1w = df_ust_var.iloc[-5] if len(df_ust_var) >= 5 else None
+                var_1m = df_ust_var.iloc[-21] if len(df_ust_var) >= 21 else None
+
+                # Montar DataFrame de variações
+                tenores = ["2Y", "5Y", "7Y", "10Y", "20Y", "30Y"]
+                variacoes_data = []
+
+                for tenor in tenores:
+                    if tenor in df_ust.columns:
+                        row = {
+                            "Vencimento": tenor,
+                            "Taxa Atual": f"{ultimo_dia[tenor]:.2f}%"
+                        }
+
+                        # Variação 1D
+                        if var_1d is not None and f"{tenor}_1D" in df_ust_var.columns:
+                            var = df_ust_var[f"{tenor}_1D"].iloc[-1]
+                            row["Taxa D-1"] = f"{(ultimo_dia[tenor] - var):.2f}%" if pd.notna(var) else ""
+                            row["Var D-1 (bps)"] = f"{(var * 100):+.2f}" if pd.notna(var) else ""
+
+                        # Variação 1W
+                        if var_1w is not None and f"{tenor}_1W" in df_ust_var.columns:
+                            var = df_ust_var[f"{tenor}_1W"].iloc[-5] if len(df_ust_var) >= 5 else None
+                            row["Taxa D-7"] = f"{(ultimo_dia[tenor] - var):.2f}%" if pd.notna(var) else ""
+                            row["Var D-7 (bps)"] = f"{(var * 100):+.2f}" if pd.notna(var) else ""
+
+                        # Variação 1M
+                        if var_1m is not None and f"{tenor}_1M" in df_ust_var.columns:
+                            var = df_ust_var[f"{tenor}_1M"].iloc[-21] if len(df_ust_var) >= 21 else None
+                            row["Taxa D-30"] = f"{(ultimo_dia[tenor] - var):.2f}%" if pd.notna(var) else ""
+                            row["Var D-30 (bps)"] = f"{(var * 100):+.2f}" if pd.notna(var) else ""
+
+                        variacoes_data.append(row)
+
+                df_ust_variacoes = pd.DataFrame(variacoes_data)
+
+                # Gerar gráfico de curvas
+                fig_ust_curva_html = plt.figure(figsize=(10, 6))
+                ax = fig_ust_curva_html.add_subplot(111)
+
+                # Plotar curva atual e períodos anteriores
+                periodos_plot = [0, 7, 30]  # Atual, 7 dias, 30 dias
+                labels_plot = ["Atual", "7 dias atrás", "30 dias atrás"]
+                cores_curva = ['#1f77b4', '#ff7f0e', '#2ca02c']
+
+                for i, (periodo, label) in enumerate(zip(periodos_plot, labels_plot)):
+                    idx = -1 - periodo if periodo > 0 else -1
+                    if abs(idx) <= len(df_ust):
+                        row = df_ust.iloc[idx]
+                        tenores_x = ["2Y", "5Y", "7Y", "10Y", "20Y", "30Y"]
+                        valores_y = [row[t] if t in row and pd.notna(row[t]) else None for t in tenores_x]
+
+                        ax.plot(tenores_x, valores_y, marker='o', label=label, linewidth=2, markersize=6, color=cores_curva[i], alpha=0.85)
+
+                        # Adicionar label no último ponto para todas as curvas
+                        for j, (tenor, valor) in enumerate(zip(tenores_x, valores_y)):
+                            if valor is not None and j == len(tenores_x) - 1:  # Último ponto (30Y)
+                                ax.annotate(f'{valor:.2f}%',
+                                           xy=(tenor, valor),
+                                           xytext=(8, 0),
+                                           textcoords='offset points',
+                                           fontsize=9,
+                                           fontweight='bold',
+                                           va='center',
+                                           color=cores_curva[i],
+                                           bbox=dict(boxstyle='round,pad=0.4',
+                                                   facecolor='white',
+                                                   alpha=0.9,
+                                                   edgecolor=cores_curva[i],
+                                                   linewidth=1.5))
+
+                ax.set_title("Curva de Treasuries US", fontsize=14, fontweight='bold')
+                ax.set_xlabel("Tenor", fontsize=10)
+                ax.set_ylabel("Taxa (%)", fontsize=10)
+                ax.grid(True, alpha=0.3, linestyle='--')
+                ax.legend(loc='best', fontsize=10, framealpha=0.9)
+
+                # Gerar gráfico histórico com múltiplos vencimentos
+                tenores_hist = ["5Y", "7Y", "10Y", "20Y", "30Y"]
+                tenores_disponiveis = [t for t in tenores_hist if t in df_ust.columns]
+
+                if len(tenores_disponiveis) > 0:
+                    fig_ust_hist_10y_html = plt.figure(figsize=(14, 7))
+                    ax = fig_ust_hist_10y_html.add_subplot(111)
+
+                    # Cores para cada tenor
+                    cores = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd']
+
+                    for i, tenor in enumerate(tenores_disponiveis):
+                        # Plotar linha
+                        ax.plot(df_ust.index, df_ust[tenor],
+                               linewidth=2.5,
+                               color=cores[i % len(cores)],
+                               label=tenor,
+                               alpha=0.85)
+
+                        # Adicionar label do último valor
+                        ultimo_idx = df_ust[tenor].last_valid_index()
+                        if ultimo_idx is not None:
+                            ultimo_valor = df_ust.loc[ultimo_idx, tenor]
+                            ax.annotate(f'{ultimo_valor:.2f}%',
+                                       xy=(ultimo_idx, ultimo_valor),
+                                       xytext=(8, 0),
+                                       textcoords='offset points',
+                                       fontsize=9,
+                                       fontweight='bold',
+                                       va='center',
+                                       color=cores[i % len(cores)],
+                                       bbox=dict(boxstyle='round,pad=0.4',
+                                               facecolor='white',
+                                               alpha=0.8,
+                                               edgecolor=cores[i % len(cores)],
+                                               linewidth=1.5))
+
+                    ax.set_title("Histórico - US Treasuries", fontsize=14, fontweight='bold')
+                    ax.set_xlabel("Data", fontsize=10)
+                    ax.set_ylabel("Taxa (%)", fontsize=10)
+                    ax.grid(True, alpha=0.3, linestyle='--')
+                    ax.legend(loc='best', fontsize=10, framealpha=0.9)
+
+                    # Formatar eixo x
+                    ax.xaxis.set_major_locator(mdates.AutoDateLocator())
+                    ax.xaxis.set_major_formatter(mdates.DateFormatter('%b/%Y'))
+                    plt.setp(ax.get_xticklabels(), rotation=45, ha='right')
+
+                logging.info("Gráficos de Treasuries gerados com sucesso")
+
+        except Exception as e:
+            logging.error(f"Erro ao processar Treasuries: {e}")
+
+    # ============================================
+    # Gerar HTML (NTN-B + DI Futuro + Análises + Treasuries)
     # ============================================
     html_content = gerar_html_relatorio(
         df_var_html if df_var_html is not None else pd.DataFrame(),
@@ -2252,7 +2464,11 @@ def main() -> None:
         df_steepness_di=df_steepness_di,
         df_steepness_ntnb=df_steepness_ntnb,
         df_stats_di=df_stats_di,
-        df_focus=df_focus
+        df_focus=df_focus,
+        # Treasuries US
+        df_ust_variacoes=df_ust_variacoes,
+        fig_ust_curva=fig_ust_curva_html,
+        fig_ust_hist_10y=fig_ust_hist_10y_html
     )
 
     # Salvar HTML
@@ -2279,6 +2495,12 @@ def main() -> None:
         plt.close(fig_di_hist_3y_html)
     if fig_di_hist_5y_html is not None:
         plt.close(fig_di_hist_5y_html)
+
+    # Fechar figuras HTML (Treasuries)
+    if fig_ust_curva_html is not None:
+        plt.close(fig_ust_curva_html)
+    if fig_ust_hist_10y_html is not None:
+        plt.close(fig_ust_hist_10y_html)
 
     # ============================================
     # ENVIAR EMAIL

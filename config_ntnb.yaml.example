@@ -165,6 +165,38 @@ focus_bcb:
     - "IPCA"
     - "Selic"
 
+# Configurações US Treasuries
+treasuries:
+  enabled: false  # Mude para true para habilitar coleta de Treasuries
+  fred_api_key: "sua_fred_api_key_aqui"  # Obtenha gratuitamente em: https://fred.stlouisfed.org/docs/api/api_key.html
+  lookback_days: 365  # Dias históricos para baixar (padrão: 365)
+
+# Análise GPT (ChatGPT/OpenAI)
+gpt_analise:
+  enabled: false  # Mude para true para habilitar análise com IA
+  api_key: "sua_api_key_openai_aqui"  # Obtenha em: https://platform.openai.com/api-keys
+  model: "gpt-4o"  # Opções: "gpt-4o", "gpt-4.1", "gpt-4o-mini" (mais barato)
+  max_tokens: 500  # Máximo de tokens na resposta
+  temperature: 0.7  # Criatividade (0.0 = determinístico, 1.0 = criativo)
+
+  # Prompt customizável (use {dados} para inserir os dados do mercado)
+  prompt_template: |
+    Você é um analista de mercado financeiro brasileiro especializado em renda fixa.
+
+    Analise os dados das curvas de juros brasileiras abaixo e forneça uma análise concisa (máximo 250 palavras) considerando:
+    - Movimentação das taxas NTN-B (títulos indexados à inflação) e DI Futuro (taxas nominais)
+    - Steepness (inclinação da curva) e seu significado
+    - Breakeven Inflation (inflação implícita)
+    - Expectativas FOCUS do Banco Central
+    - Contexto macroeconômico atual do Brasil (política monetária, fiscal, inflação)
+
+    Seja objetivo, profissional e forneça insights relevantes para investidores.
+
+    DADOS DO MERCADO:
+    {dados}
+
+    ANÁLISE:
+
 # Configurações de Email
 email:
   enabled: false  # Mude para true para habilitar envio automático
